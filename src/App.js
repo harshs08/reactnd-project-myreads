@@ -12,7 +12,12 @@ class BooksApp extends React.Component {
      * pages, as well as provide a good URL they can bookmark and share.
      */
     showSearchPage: false,
-    books: []
+    books: [],
+    shelves: [
+      ["currentlyReading", "Currently Reading"],
+      ["wantToRead", "Want to Read"],
+      ["read", "Read"]
+    ]
   }
 
   componentDidMount() {
@@ -20,7 +25,56 @@ class BooksApp extends React.Component {
       .then((books) => {
         this.setState({ books })
       })
+      .catch((e) => {
+        console.log(e)
+      })
   }
+
+  updateShelf = (book, newShelf) => {
+
+    //check if book is already in collection
+    let isInSelf = false
+
+    this.state.books.forEach((item) => {
+      item.id === book.id && (isInSelf=true)
+    })
+
+
+    //call update API
+    BooksAPI.update({ id: book.id}, newShelf )
+      .then((response) => {
+        //if book already in shelf, change state of book in state
+        // without calling the getAll() API, better performance
+        if(isInSelf) {
+          let updatedBooks = JSON.parse(JSON.stringify(this.state.books))
+          updatedBooks.forEach((item) => {
+            if(item.id === book.id) {
+              item.shelf = newShelf
+            }
+          })
+
+          // update state with new collection (which now has the book's
+          // new shelf category)
+          this.setState({ books: updatedBooks })
+        }
+        else {
+          //book is new, update collection in state by calling API
+          //to retrieve updated collection from server (which now has
+          // the new book already added)
+          BooksAPI.getAll()
+            .then((books) => {
+              this.setState({ books })
+            })
+            .catch((e) => {
+              console.log(e)
+            })
+        }
+      })
+      .catch((e) => {
+        console.error(e)
+      })
+
+    }
 
   render() {
     return (
@@ -46,7 +100,11 @@ class BooksApp extends React.Component {
               <ol className="books-grid"></ol>
             </div>
           </div>
-        ) : ( <ListBooks books={this.state.books} />
+        ) : ( <ListBooks 
+               shelfBooks={this.state.books}
+               shelves={this.state.shelves}
+               changeShelf={this.updateShelf}
+              />
         )}
       </div>
     )

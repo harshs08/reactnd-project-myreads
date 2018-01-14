@@ -3,30 +3,54 @@ import propTypes from 'prop-types'
 import BookShelf from './BookShelf'
 
 class ListBooks extends Component {
-	static propTypes = {
-		books: propTypes.array.isRequired
-	}
+  static propTypes = {
+    shelfBooks: propTypes.array.isRequired,
+    shelves: propTypes.array.isRequired,
+    changeShelf: propTypes.func.isRequired
+  }
 
-	state = {
-		shelves: ['currentlyReading', 'wantToRead', 'read']
-	}
+  render() {
+    let { shelfBooks, shelves, changeShelf } = this.props
 
-	render() {
-		return (
-			<div className="list-books">
-				<div className="list-books-title">
-					<h1>MyReads</h1>
-				</div>
-				<div className="list-books-content">
-					<div>
-						{this.state.shelves.map( (shelfname, index) => {
-							return <BookShelf key={index} shelfname={shelfname} books={this.props.books} />
-						})}
-					</div>
-				</div>
-			</div>
-		)
-	}
+    let selfBook = (shelf) => {
+
+      if (shelf === shelves[0][0]){
+        return shelfBooks.filter((book) => {
+          return book.shelf === shelves[0][0]
+        })
+      }
+      else if (shelf === shelves[1][0]){
+        return shelfBooks.filter((book) => {
+          return book.shelf === shelves[1][0]
+        })
+      }
+      else if (shelf === shelves[2][0]){
+        return shelfBooks.filter((book) => {
+          return book.shelf === shelves[2][0]
+        })
+      }
+    }
+
+    return (
+      <div className="list-books">
+        <div className="list-books-title">
+          <h1>MyReads</h1>
+        </div>
+        <div className="list-books-content">
+          <div>
+            {shelves.map( (shelf, _) => {
+              return <BookShelf
+                      key={shelf[0]}
+                      shelfname={shelf[1]}
+                      books={selfBook(shelf[0])}
+                      changeShelf={changeShelf}
+                     />
+            })}
+          </div>
+        </div>
+      </div>
+    )
+  }
 }
 
 export default ListBooks
