@@ -1,13 +1,14 @@
-import React, { Component } from 'react';
-import propTypes, { func } from 'prop-types'
+import React, { Component } from 'react'
+import { Link } from 'react-router-dom'
+import propTypes from 'prop-types'
 import * as BooksAPI from './BooksAPI'
-import Book from './Book';
+import Book from './Book'
 
 class Search extends Component {
 
   static propTypes = {
     books: propTypes.array.isRequired,
-    updateShelf: propTypes.func.isRequired
+    changeShelf: propTypes.func.isRequired
   }
 
   state = {
@@ -18,12 +19,13 @@ class Search extends Component {
     if(text) {
       BooksAPI.search(text)
         .then((resp) => {
+          this.setState({
             searchResults: resp
           })
         })
         .catch((e) => {
           console.error(e)
-        }).
+        })
     }
     else {
       this.setState({searchResults: []})
@@ -32,11 +34,12 @@ class Search extends Component {
 
   render() {
     let { searchResults } = this.state
-    let { updateShelf, books } = this.props
+    let { books, changeShelf } = this.props
 
     return(
       <div className="search-books">
         <div className="search-books-bar">
+          <Link to="/" className="close-search">Close</Link>
           <div className="search-books-input-wrapper">
             <input 
               type="text" placeholder="Search by title or author"
@@ -46,7 +49,7 @@ class Search extends Component {
         </div>
         <div className="search-books-results">
           <ol className="books-grid">
-            {((searchResults != undefined) && (searchResults.length >0 )) ? (
+            {((searchResults !== undefined) && (searchResults.length >0 )) ? (
               searchResults.map(book => {
                 let presetSelectMenuValue = "none"
 
@@ -68,7 +71,7 @@ class Search extends Component {
                   </li>
                 )})
               ) : (
-                <h2>No Books</h2>
+                <h2>Type in Search Bar to See Books</h2>
               )}
           </ol>
         </div>

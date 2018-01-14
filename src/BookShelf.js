@@ -1,10 +1,9 @@
 import React from 'react'
+
 import Book from './Book'
 
 const BookShelf = (props) => {
-
    let { shelfname, books, changeShelf } = props
-
 
    return(
       <div className="bookshelf" >
